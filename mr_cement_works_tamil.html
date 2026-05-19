@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="ta">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MR Cement Works</title>
+
+<style>
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+  font-family:Arial,sans-serif;
+}
+
+body{
+  background:#f4f4f4;
+  color:#222;
+}
+
+header{
+  background:#1f1f1f;
+  color:white;
+  padding:20px;
+  text-align:center;
+}
+
+header h1{
+  font-size:38px;
+}
+
+.container{
+  width:95%;
+  max-width:1200px;
+  margin:30px auto;
+  display:grid;
+  grid-template-columns:350px 1fr;
+  gap:25px;
+}
+
+.controls{
+  background:white;
+  padding:25px;
+  border-radius:16px;
+  box-shadow:0 4px 12px rgba(0,0,0,0.1);
+}
+
+.controls h2{
+  margin-bottom:20px;
+}
+
+label{
+  display:block;
+  margin-top:15px;
+  margin-bottom:8px;
+  font-weight:bold;
+}
+
+input{
+  width:100%;
+  padding:12px;
+  border-radius:10px;
+  border:1px solid #ccc;
+  font-size:16px;
+}
+
+button{
+  width:100%;
+  padding:14px;
+  margin-top:20px;
+  border:none;
+  border-radius:10px;
+  background:#111;
+  color:white;
+  font-size:17px;
+  cursor:pointer;
+}
+
+.preview{
+  background:linear-gradient(to top,#8ecf72 25%,#87ceeb 25%);
+  border-radius:20px;
+  min-height:500px;
+  position:relative;
+  overflow-x:auto;
+  padding:30px;
+}
+
+.compound-area{
+  display:flex;
+  align-items:flex-end;
+  min-height:350px;
+  padding-top:80px;
+  padding-left:50px;
+}
+
+.compound-section{
+  position:relative;
+  width:240px;
+  height:260px;
+  display:flex;
+  justify-content:center;
+  align-items:flex-end;
+}
+
+.post{
+  width:24px;
+  background:linear-gradient(to right,#777,#ddd,#777);
+  position:absolute;
+  bottom:0;
+  border-radius:5px;
+}
+
+.left-post{
+  left:0;
+}
+
+.right-post{
+  right:0;
+}
+
+.slabs{
+  width:190px;
+  display:flex;
+  flex-direction:column;
+  justify-content:flex-end;
+  gap:8px;
+  margin-bottom:10px;
+}
+
+.slab{
+  height:18px;
+  background:linear-gradient(to right,#aaa,#ececec,#999);
+  border-radius:4px;
+}
+
+.measurement{
+  position:absolute;
+  top:15px;
+  width:100%;
+  text-align:center;
+  font-weight:bold;
+  font-size:18px;
+}
+
+.road{
+  width:100%;
+  height:50px;
+  background:#555;
+  position:absolute;
+  bottom:0;
+  left:0;
+}
+
+.road::before{
+  content:'';
+  position:absolute;
+  width:100%;
+  top:22px;
+  border-top:5px dashed white;
+}
+
+.result-box{
+  margin-top:20px;
+  background:#f0f0f0;
+  padding:15px;
+  border-radius:10px;
+  line-height:1.8;
+}
+
+footer{
+  text-align:center;
+  padding:20px;
+}
+
+@media(max-width:900px){
+  .container{
+    grid-template-columns:1fr;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+<h1>MR Cement Works</h1>
+<p>ரெடிமேட் காம்பவுண்ட் நேரடி காட்சி</p>
+</header>
+
+<div class="container">
+
+<div class="controls">
+<h2>அளவுகளை உள்ளிடுங்கள்</h2>
+
+<label>மொத்த நீளம் (மீட்டர்)</label>
+<input type="number" id="totalLength" placeholder="உதாரணம்: 12">
+
+<label>போஸ்ட் உயரம் (மீட்டர்)</label>
+<input type="number" id="postHeight" placeholder="உதாரணம்: 6">
+
+<button onclick="generateCompound()">காம்பவுண்ட் காட்சி காண்க</button>
+
+<div class="result-box" id="resultBox">
+மொத்த மீட்டர் மற்றும் உயரத்தை உள்ளிடுங்கள்.
+</div>
+
+</div>
+
+<div class="preview">
+<div class="compound-area" id="compoundArea"></div>
+<div class="road"></div>
+</div>
+
+</div>
+
+<footer>
+© 2026 MR Cement Works - சேலம்
+</footer>
+
+<script>
+
+function getSlabCount(height){
+  if(height == 6) return 4;
+  if(height == 7) return 5;
+  if(height == 8) return 6;
+  if(height == 10) return 8;
+  if(height == 12) return 10;
+
+  return Math.max(1, height - 2);
+}
+
+function generateCompound(){
+
+  const totalLength = parseFloat(document.getElementById('totalLength').value);
+  const postHeight = parseFloat(document.getElementById('postHeight').value);
+
+  const compoundArea = document.getElementById('compoundArea');
+  const resultBox = document.getElementById('resultBox');
+
+  compoundArea.innerHTML = '';
+
+  if(!totalLength || !postHeight){
+    resultBox.innerHTML = 'சரியான அளவுகளை உள்ளிடுங்கள்';
+    return;
+  }
+
+  const sectionLength = 6;
+  const sections = Math.floor(totalLength / sectionLength);
+  const remaining = totalLength % sectionLength;
+
+  const slabCount = getSlabCount(postHeight);
+
+  for(let i=0;i<sections;i++){
+
+    let slabsHTML = '';
+
+    for(let s=0;s<slabCount;s++){
+      slabsHTML += '<div class="slab"></div>';
+    }
+
+    const section = document.createElement('div');
+    section.className = 'compound-section';
+
+    section.innerHTML = `
+      <div class="measurement">6 மீட்டர்</div>
+
+      <div class="post left-post" style="height:${postHeight * 25}px"></div>
+
+      <div class="slabs">
+        ${slabsHTML}
+      </div>
+
+      <div class="post right-post" style="height:${postHeight * 25}px"></div>
+    `;
+
+    compoundArea.appendChild(section);
+  }
+
+  if(remaining > 0){
+
+    let slabsHTML = '';
+
+    for(let s=0;s<slabCount;s++){
+      slabsHTML += '<div class="slab"></div>';
+    }
+
+    const partial = document.createElement('div');
+    partial.className = 'compound-section';
+    partial.style.width = `${remaining * 40}px`;
+
+    partial.innerHTML = `
+      <div class="measurement">${remaining} மீட்டர்</div>
+
+      <div class="post left-post" style="height:${postHeight * 25}px"></div>
+
+      <div class="slabs" style="width:${remaining * 30}px">
+        ${slabsHTML}
+      </div>
+
+      <div class="post right-post" style="height:${postHeight * 25}px"></div>
+    `;
+
+    compoundArea.appendChild(partial);
+  }
+
+  resultBox.innerHTML = `
+    <strong>மொத்த நீளம்:</strong> ${totalLength} மீட்டர் <br>
+    <strong>போஸ்ட் உயரம்:</strong> ${postHeight} மீட்டர் <br>
+    <strong>ஒவ்வொரு பகுதியிலும் ஸ்லாப்:</strong> ${slabCount} <br>
+    <strong>முழு காம்பவுண்ட் எண்ணிக்கை:</strong> ${sections} <br>
+    <strong>மீதமுள்ள நீளம்:</strong> ${remaining} மீட்டர்
+  `;
+}
+
+</script>
+
+</body>
+</html>
